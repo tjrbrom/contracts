@@ -1,9 +1,8 @@
-# Contracts Graph
+Playing with the TinkerPop graph library.
+What I'm doing here is managing relationships between graph elements and some traversal.
 
-Manage relationships between contracts and graph traversal using TinkerPop graph library. 
-
-It provides functionalities to initialize a graph with contract members, 
-add new contracts, establish and modify parent-child relationships, 
+Functionalities include initializing a graph with contract members,
+adding new contracts, establishing and modifying parent-child relationships,
 and perform depth calculations within the graph.
 
 ## Features
@@ -26,8 +25,8 @@ ContractsGraph contractsGraph = new ContractsGraph();
 // Initialize the graph with contract members
 contractsGraph.init(contractMembers);
 
-// Add a new contract
-contractsGraph.addContract(newContractMember);
+// Create a new contract
+contractsGraph.createContract(newContractMember);
 
 // Join a contract
 contractsGraph.joinContract(contractMemberToJoin);
