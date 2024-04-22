@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.contracts.model.ContractMember;
 import org.contracts.model.IContractMember;
 
 /**
@@ -93,19 +94,21 @@ public final class ContractsGraph {
    * @param contractMember
    */
   public void joinContract(IContractMember contractMember) {
-    if (!Strings.isNullOrEmpty(contractMember.contractId())
-        && !Strings.isNullOrEmpty(contractMember.parentId())) {
+    String contractId = contractMember.contractId();
+    String parentId = contractMember.parentId();
+    if (!Strings.isNullOrEmpty(contractId)
+        && !Strings.isNullOrEmpty(parentId)) {
       // check if these contract and parent exist
       Vertex contract =
           g.V()
               .hasLabel("contract")
-              .has("contract id", contractMember.contractId())
+              .has("contract id", contractId)
               .tryNext()
               .orElse(null);
       Vertex parent =
           g.V()
               .hasLabel("contract")
-              .has("contract id", contractMember.parentId())
+              .has("contract id", parentId)
               .tryNext()
               .orElse(null);
 
@@ -117,6 +120,9 @@ public final class ContractsGraph {
         // Add new "parent" and "child" edges
         g.V(parent).addE("parent").to(contract).next();
         g.V(contract).addE("child").to(parent).next();
+
+        // update the existing contract vertice
+        ((ContractMember) getDataByContractId(contractId)).setParentId(parentId);
       } else {
         log.error("One or both vertices do not exist.");
       }
