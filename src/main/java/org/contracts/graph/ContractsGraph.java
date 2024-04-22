@@ -7,12 +7,18 @@ import com.google.common.base.Strings;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.contracts.model.IContractMember;
 
+/**
+ * The idea is that each contract member has its own family, and also has a parent contract (which
+ * is also a family by itself).
+ */
 @Slf4j
 public final class ContractsGraph {
   private final TinkerGraph graph = TinkerGraph.open();
@@ -117,7 +123,7 @@ public final class ContractsGraph {
     }
   }
 
-  public long countParentDepth(String contractId) {
+  public long countMaxParentDepth(String contractId) {
     Vertex contract =
         g.V().hasLabel("contract").has("contract id", contractId).tryNext().orElse(null);
 
@@ -134,7 +140,7 @@ public final class ContractsGraph {
     }
   }
 
-  public long countChildDepth(String contractId) {
+  public long countMaxChildDepth(String contractId) {
     Vertex contract =
         g.V().hasLabel("contract").has("contract id", contractId).tryNext().orElse(null);
 
@@ -210,6 +216,16 @@ public final class ContractsGraph {
             .tryNext()
             .orElse(null);
     return g.V(contract).outE("child").where(inV().is(parent)).hasNext();
+  }
+
+  Object getDataByContractId(String contractId) {
+    return Objects.requireNonNull(
+      g.V().hasLabel("contract")
+      .has("contract id", contractId)
+      .tryNext()
+      .orElse(null))
+      .property("data")
+      .value();
   }
 
   void clear() {

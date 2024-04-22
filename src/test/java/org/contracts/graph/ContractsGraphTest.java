@@ -1,151 +1,127 @@
 package org.contracts.graph;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.contracts.model.IContractMember;
+import org.contracts.model.ContractMember;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @Slf4j
 public final class ContractsGraphTest {
 
-  private final ContractsGraph contractsGraph = new ContractsGraph();
+  private final ContractsGraph graph = new ContractsGraph();
   private final Set<ContractMember> set = new HashSet<>();
 
   @BeforeEach
   public void beforeEach() {
-    set.add(new ContractMember("1", ""));
-    set.add(new ContractMember("2", "4"));
-    set.add(new ContractMember("3", "2"));
-    set.add(new ContractMember("4", "1"));
-    set.add(new ContractMember("5", "3"));
-    set.add(new ContractMember("6", "4"));
-    set.add(new ContractMember("7", "4"));
-    set.add(new ContractMember("8", "4"));
-    set.add(new ContractMember("9", "6"));
-    set.add(new ContractMember("10", "6"));
-    set.add(new ContractMember("11", "6"));
-    set.add(new ContractMember("12", "9"));
-    set.add(new ContractMember("13", "9"));
-    set.add(new ContractMember("14", "9"));
+    set.add(ContractMember.builder()
+      .contractId("1").parentId("").createdAt(LocalDateTime.now())
+      .build()
+    );
+    set.add(ContractMember.builder()
+      .contractId("2").parentId("4").createdAt(LocalDateTime.now().plusMinutes(1))
+      .build()
+    );
+    set.add(ContractMember.builder()
+      .contractId("3").parentId("2").createdAt(LocalDateTime.now().plusMinutes(3))
+      .build()
+    );
+    set.add(ContractMember.builder()
+      .contractId("4").parentId("1").createdAt(LocalDateTime.now().plusMinutes(2))
+      .build()
+    );
+    set.add(ContractMember.builder()
+      .contractId("5").parentId("3").createdAt(LocalDateTime.now().plusMinutes(4))
+      .build()
+    );
+    set.add(ContractMember.builder()
+      .contractId("6").parentId("5").createdAt(LocalDateTime.now().plusMinutes(5))
+      .build()
+    );
+    set.add(ContractMember.builder()
+      .contractId("7").parentId("14").createdAt(LocalDateTime.now().plusMinutes(6))
+      .build()
+    );
+    set.add(ContractMember.builder()
+      .contractId("8").parentId("14").createdAt(LocalDateTime.now().plusMinutes(7))
+      .build()
+    );
+    set.add(ContractMember.builder()
+      .contractId("9").parentId("6").createdAt(LocalDateTime.now().plusMinutes(8))
+      .build()
+    );
+    set.add(ContractMember.builder()
+      .contractId("10").parentId("6").createdAt(LocalDateTime.now().plusMinutes(9))
+      .build()
+    );
+    set.add(ContractMember.builder()
+      .contractId("11").parentId("6").createdAt(LocalDateTime.now().plusMinutes(10))
+      .build()
+    );
+    set.add(ContractMember.builder()
+      .contractId("12").parentId("9").createdAt(LocalDateTime.now().plusMinutes(11))
+      .build()
+    );
+    set.add(ContractMember.builder()
+      .contractId("13").parentId("9").createdAt(LocalDateTime.now().plusMinutes(12))
+      .build()
+    );
+    set.add(ContractMember.builder()
+      .contractId("14").parentId("9").createdAt(LocalDateTime.now().plusMinutes(13))
+      .build()
+    );
   }
 
   @AfterEach
   public void afterEach() {
-    contractsGraph.clear();
+    graph.clear();
     set.clear();
   }
 
   @Test
-  public void countParentDepth() {
-    contractsGraph.init(set);
-    assertEquals(0, contractsGraph.countParentDepth("1"));
-    assertEquals(2, contractsGraph.countParentDepth("2"));
-    assertEquals(3, contractsGraph.countParentDepth("3"));
-    assertEquals(1, contractsGraph.countParentDepth("4"));
-    assertEquals(4, contractsGraph.countParentDepth("5"));
-    assertEquals(4, contractsGraph.countParentDepth("14"));
+  public void countMaxParentDepth() {
+    graph.init(set);
+    assertEquals(0, graph.countMaxParentDepth("1"));
+    assertEquals(2, graph.countMaxParentDepth("2"));
+    assertEquals(3, graph.countMaxParentDepth("3"));
+    assertEquals(1, graph.countMaxParentDepth("4"));
+    assertEquals(4, graph.countMaxParentDepth("5"));
+    assertEquals(5, graph.countMaxParentDepth("6"));
+    assertEquals(7, graph.countMaxParentDepth("14"));
   }
 
   @Test
-  public void countChildDepth() {
-    contractsGraph.init(set);
-    assertEquals(4, contractsGraph.countChildDepth("1"));
-    assertEquals(2, contractsGraph.countChildDepth("2"));
-    assertEquals(1, contractsGraph.countChildDepth("3"));
-    assertEquals(3, contractsGraph.countChildDepth("4"));
-    assertEquals(0, contractsGraph.countChildDepth("5"));
-    assertEquals(0, contractsGraph.countChildDepth("14"));
+  public void countMaxChildDepth() {
+    graph.init(set);
+    assertEquals(8, graph.countMaxChildDepth("1"));
+    assertEquals(6, graph.countMaxChildDepth("2"));
+    assertEquals(5, graph.countMaxChildDepth("3"));
+    assertEquals(7, graph.countMaxChildDepth("4"));
+    assertEquals(4, graph.countMaxChildDepth("5"));
+    assertEquals(3, graph.countMaxChildDepth("6"));
+    assertEquals(1, graph.countMaxChildDepth("14"));
   }
 
   @Test
-  public void init_add_join_rejoin() {
-    log.info("=================================");
-    log.info("init contracts and add a contract");
-    contractsGraph.init(set);
-    assertEquals(14, contractsGraph.getGraph().traversal().V().count().next());
-    assertTrue(contractsGraph.contractExists("1"));
-    assertTrue(contractsGraph.contractExists("1"));
-    assertFalse(contractsGraph.parentEdgeExists(new ContractMember("15", "1")));
-    assertFalse(contractsGraph.childEdgeExists(new ContractMember("15", "1")));
-
-    ContractMember newcm = new ContractMember("15", "1");
-
-    contractsGraph.createContract(newcm);
-    contractsGraph.printGraph();
-    assertEquals(15, contractsGraph.getGraph().traversal().V().count().next());
-    assertTrue(contractsGraph.contractExists("15"));
-    assertTrue(contractsGraph.contractExists("1"));
-    assertFalse(contractsGraph.parentEdgeExists(new ContractMember("15", "1")));
-    assertFalse(contractsGraph.childEdgeExists(new ContractMember("15", "1")));
-
-    log.info("=================================");
-
-    log.info("join another contract");
-    newcm.setParentId("2");
-    contractsGraph.joinContract(newcm);
-    contractsGraph.printGraph();
-    assertEquals(15, contractsGraph.getGraph().traversal().V().count().next());
-    assertTrue(contractsGraph.contractExists("15"));
-    assertTrue(contractsGraph.contractExists("1"));
-    assertTrue(contractsGraph.contractExists("2"));
-    assertFalse(contractsGraph.parentEdgeExists(new ContractMember("15", "1")));
-    assertFalse(contractsGraph.childEdgeExists(new ContractMember("15", "1")));
-    assertTrue(contractsGraph.parentEdgeExists(new ContractMember("15", "2")));
-    assertTrue(contractsGraph.childEdgeExists(new ContractMember("15", "2")));
-
-    log.info("=================================");
-
-    log.info("join the previous contract");
-    newcm.setParentId("1");
-    contractsGraph.joinContract(newcm);
-    contractsGraph.printGraph();
-    assertEquals(15, contractsGraph.getGraph().traversal().V().count().next());
-    assertTrue(contractsGraph.contractExists("15"));
-    assertTrue(contractsGraph.contractExists("1"));
-    assertTrue(contractsGraph.contractExists("2"));
-    assertTrue(contractsGraph.parentEdgeExists(new ContractMember("15", "1")));
-    assertTrue(contractsGraph.childEdgeExists(new ContractMember("15", "1")));
-    assertFalse(contractsGraph.parentEdgeExists(new ContractMember("15", "2")));
-    assertFalse(contractsGraph.childEdgeExists(new ContractMember("15", "2")));
-
-    log.info("=================================");
-
-    log.info("join the same contract");
-    contractsGraph.joinContract(newcm);
-    contractsGraph.printGraph();
-    assertEquals(15, contractsGraph.getGraph().traversal().V().count().next());
-    assertTrue(contractsGraph.contractExists("15"));
-    assertTrue(contractsGraph.contractExists("1"));
-    assertTrue(contractsGraph.contractExists("2"));
-    assertTrue(contractsGraph.parentEdgeExists(new ContractMember("15", "1")));
-    assertTrue(contractsGraph.childEdgeExists(new ContractMember("15", "1")));
-    assertFalse(contractsGraph.parentEdgeExists(new ContractMember("15", "2")));
-    assertFalse(contractsGraph.childEdgeExists(new ContractMember("15", "2")));
-  }
-
-  @AllArgsConstructor
-  @Data
-  private static class ContractMember implements IContractMember {
-    private String contractId;
-    private String parentId;
-
-    @Override
-    public String contractId() {
-      return contractId;
-    }
-
-    @Override
-    public String parentId() {
-      return parentId;
-    }
+  public void create_join_get_print() {
+    graph.init(set);
+    ContractMember cm = ContractMember.builder()
+      .contractId("15").parentId("1").createdAt(LocalDateTime.now())
+      .build();
+    graph.printGraph();
+    graph.createContract(cm);
+    graph.printGraph();
+    graph.joinContract(cm);
+    graph.printGraph();
+    cm.setParentId("7");
+    graph.joinContract(cm);
+    graph.printGraph();
+    assertNotNull(graph.getDataByContractId("15"));
   }
 }

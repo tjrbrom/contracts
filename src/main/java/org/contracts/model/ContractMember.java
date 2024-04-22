@@ -1,17 +1,17 @@
 package org.contracts.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Builder
-@NoArgsConstructor
 @Data
 public class ContractMember implements IContractMember {
-    private String contractId;
+    private final String contractId;
     private String parentId;
+    @Getter
+    private final LocalDateTime createdAt;
 
     @Override
     public String contractId() {
