@@ -1,6 +1,6 @@
 Playing with the TinkerPop graph library.
 Functionalities include initializing a graph with contract members,
-adding new contracts, establishing and modifying parent-child relationships by joining other contracts and/or braking existing membership,
+adding new contracts, establishing and modifying parent-child relationships by joining other contracts and/or breaking existing membership,
 as well as perform depth calculations within the graph.
 
 A depth limit of 4 has been enforced to prevent cyclic relationships when a contract member attempts to leave one parent and join another that is a close relative. 
