@@ -1,6 +1,5 @@
 Playing with the TinkerPop graph library.
 What I'm doing here is managing relationships between graph elements and some traversal.
-
 Functionalities include initializing a graph with contract members,
 adding new contracts, establishing and modifying parent-child relationships,
 and perform depth calculations within the graph.
