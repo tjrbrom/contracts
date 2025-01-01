@@ -5,8 +5,8 @@ Functionalities include initializing a graph with contract members,
 adding new contracts, establishing and modifying parent-child relationships,
 and perform depth calculations within the graph.
 
-A depth limit of 4 is implemented specifically to prevent cyclic relationships when a contract member attempts to leave one parent and join another. 
-This restriction ensures the graph maintains a valid hierarchical structure without loops or violations of the depth constraint.
+A depth limit of 4 has been enforced to prevent cyclic relationships when a contract member attempts to leave one parent and join another that is a close relative. 
+Only distant relatives (more that 4 depth) are allowed to maintain such relationships.
 
 ## Features
 
